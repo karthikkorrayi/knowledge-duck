@@ -1,28 +1,23 @@
 export default function DashboardHeader() {
   return (
-    <header className="bg-white shadow-sm border-b flex-shrink-0">
-      <div className="px-6 py-3 flex items-center justify-between">
-        
-        {/* Logo */}
+    <header className="border-b bg-white/95 shadow-sm backdrop-blur">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 sm:px-5 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-            <span className="text-white text-xl font-bold">🎓</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+            <span className="text-xl text-white">🎓</span>
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-blue-800">Govt Jobs for Students</h1>
-          </div>
+          <h1 className="text-base font-bold text-blue-800 sm:text-lg">Govt Jobs for Students</h1>
         </div>
 
-        {/* Search Bar */}
-        <div className="flex-1 max-w-xl mx-8">
-          <div className="relative">
+        <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto md:flex-1 md:items-center md:justify-end md:pl-6">
+          <div className="relative w-full md:max-w-xl">
             <input
               type="text"
-              placeholder="Search for government jobs..."
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              placeholder="Search government jobs..."
+              className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none"
             />
             <svg
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -35,12 +30,11 @@ export default function DashboardHeader() {
               />
             </svg>
           </div>
-        </div>
 
-        {/* Get Job Alerts Button */}
-        <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
-          Get Job Alerts
-        </button>
+          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 sm:w-auto">
+            Get Job Alerts
+          </button>
+        </div>
       </div>
     </header>
   );
