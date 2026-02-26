@@ -5,9 +5,11 @@ import { fetchAllJobs } from "@/lib/supabase";
 type Job = {
   id: string;
   title: string;
-  department: string;
+  qualification?: string;
+  department?: string;
   location: string;
   last_date: string;
+  posted_date?: string;
 };
 
 const categoryPills = [
@@ -93,9 +95,9 @@ export default async function JobsPage() {
                     <div>
                       <h3 className="text-xl font-extrabold text-blue-900">{job.title}</h3>
                       <p className="mt-1 text-sm text-blue-800/80">
-                        📍 {job.location} &nbsp;|&nbsp; 🏢 {job.department}
+                        📍 {job.location} &nbsp;|&nbsp; 🎓 {job.qualification || job.department || "Qualification N/A"}
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-blue-900/80">Posted: {postedAgo(job.last_date)}</p>
+                      <p className="mt-2 text-sm font-semibold text-blue-900/80">Posted: {postedAgo(job.posted_date || job.last_date)}</p>
                     </div>
                     <div className="flex items-center justify-between gap-3 md:justify-end">
                       <span className="rounded-md bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Apply before {job.last_date}</span>

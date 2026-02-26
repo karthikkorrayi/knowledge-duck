@@ -25,7 +25,8 @@ type Job = {
   id: string;
   title: string;
   location: string;
-  department: string;
+  qualification?: string;
+  department?: string;
 };
 
 type Exam = {
@@ -83,7 +84,7 @@ export default async function HomePage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-700">🏛️</div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-bold text-gray-900">{job.title}</p>
-                    <p className="mt-0.5 text-xs text-gray-500">{job.location} • {job.department}</p>
+                    <p className="mt-0.5 text-xs text-gray-500">{job.location} • {job.qualification || job.department || "Qualification N/A"}</p>
                   </div>
                   <button className="rounded-md bg-orange-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-orange-600">Apply</button>
                 </div>
