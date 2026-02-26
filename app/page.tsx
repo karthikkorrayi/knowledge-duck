@@ -47,10 +47,10 @@ export default async function HomePage() {
   const upcomingExams: Exam[] = exams.slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-slate-100">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-50 to-slate-100">
       <DashboardHeader />
 
-      <main className="mx-auto w-full max-w-7xl space-y-4 px-3 py-4 sm:px-5 sm:py-5">
+      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 px-3 py-4 sm:px-5 sm:py-5">
         <h1 className="text-center text-xl font-black leading-tight text-blue-900 sm:text-2xl lg:text-[1.7rem]">
           Explore Latest Government Job Updates
         </h1>
