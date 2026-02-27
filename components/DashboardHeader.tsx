@@ -1,12 +1,11 @@
+import Image from "next/image";
+
 export default function DashboardHeader() {
   return (
     <header className="border-b bg-white/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 sm:px-5 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
-            <span className="text-xl text-white">🎓</span>
-          </div>
-          <h1 className="text-base font-bold text-blue-800 sm:text-lg">Govt Jobs for Students</h1>
+        <div className="flex items-center">
+          <Image src="/20221113_112233.png" alt="Knowledge Duck logo" width={300} height={64} className="h-auto w-[220px] sm:w-[280px]" priority />
         </div>
 
         <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto md:flex-1 md:items-center md:justify-end md:pl-6">
