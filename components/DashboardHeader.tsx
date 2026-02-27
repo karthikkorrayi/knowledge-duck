@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export default function DashboardHeader() {
   return (
     <header className="border-b bg-white/95 shadow-sm backdrop-blur">
@@ -33,14 +31,9 @@ export default function DashboardHeader() {
             </svg>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link href="/admin" className="rounded-lg bg-indigo-100 px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-200">
-              Admin
-            </Link>
-            <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 sm:w-auto">
-              Get Job Alerts
-            </button>
-          </div>
+          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 sm:w-auto">
+            Get Job Alerts
+          </button>
         </div>
       </div>
     </header>
