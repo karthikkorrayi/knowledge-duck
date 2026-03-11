@@ -1,6 +1,6 @@
-export const SUPABASE_URL = "https://zsqypecdfgkturkkjard.supabase.co";
-export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzcXlwZWNkZmdrdHVya2tqYXJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NTI5OTAsImV4cCI6MjA4NjEyODk5MH0.KbTS1XjzztGrvWLkrfJwbL9aDhyPgq8I0zP0uQM8rNw";
-export const SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzcXlwZWNkZmdrdHVya2tqYXJkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDU1Mjk5MCwiZXhwIjoyMDg2MTI4OTkwfQ.xnDfJR_oCMAFywvAFlXERtDCUGEtPUsg3XJmiGeMtvA"
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+export const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 export async function fetchJobs() {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/jobs?select=*&order=posted_date.desc&limit=6`,
