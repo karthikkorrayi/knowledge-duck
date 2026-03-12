@@ -226,6 +226,7 @@ export default async function JobsPage({
                 jobs.map((job, i) => (
                   <div key={job.id} className="px-5">
                     <JobCard
+                      id={job.id}
                       title={job.title}
                       department={job.organization}
                       location={STATE_LOCATION[job.state] ?? 'India'}
@@ -238,7 +239,6 @@ export default async function JobsPage({
                         'Full-Time'
                       }
                       postedAt={timeAgo(job.created_at)}
-                      applyLink={job.apply_link ?? job.notification_link ?? job.source_url}
                       isTrending={i < 2 && currentPage === 1}
                     />
                   </div>

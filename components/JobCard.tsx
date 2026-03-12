@@ -1,7 +1,10 @@
+import Link from 'next/link';
+
 // Matches the richer card design from screenshot 2:
-// Org logo | Title + badge | Location + type | Vacancies + time | Apply Now button
+// Org logo | Title + badge | Location + type | Vacancies + time | View Details button
 
 type JobCardProps = {
+  id:         string;
   title:      string;
   department: string;    // organization name
   location:   string;    // e.g. "Hyderabad" or "All India"
@@ -10,20 +13,17 @@ type JobCardProps = {
   category?:  string;
   jobType?:   string;    // "Full-Time" | "Apprenticeship" | "Contract" etc
   postedAt?:  string;    // e.g. "2 days ago"
-  applyLink?: string;
   isTrending?: boolean;
 };
 
 export default function JobCard({
+  id,
   title,
-  department,
   location,
   last_date,
   vacancies,
-  category,
   jobType = 'Full-Time',
   postedAt,
-  applyLink,
   isTrending = false,
 }: JobCardProps) {
   return (
@@ -68,7 +68,7 @@ export default function JobCard({
         </div>
       </div>
 
-      {/* Right side: vacancies + time + Apply */}
+      {/* Right side: vacancies + time + View Details */}
       <div className="flex-shrink-0 flex flex-col items-end gap-2">
         <div className="text-right">
           {vacancies && (
@@ -86,14 +86,12 @@ export default function JobCard({
             <p className="text-xs text-gray-400 mt-0.5">{postedAt}</p>
           )}
         </div>
-        <a
-          href={applyLink ?? '#'}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href={`/jobs/${id}`}
           className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap"
         >
-          Apply Now <span>›</span>
-        </a>
+          View Details <span>›</span>
+        </Link>
       </div>
 
     </div>
