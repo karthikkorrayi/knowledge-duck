@@ -1,42 +1,66 @@
-type StatsProps = {
-  total: number;
-  active: number;
+// Matches the original dashboard design:
+// Orange | Blue | Green | Purple — white text, large number, small label
+
+type StatsSectionProps = {
+  newGovtJobs:   number;
   upcomingExams: number;
+  activeJobs:    number;
+  departments:   number;
 };
 
 export default function StatsSection({
-  total,
-  active,
+  newGovtJobs,
   upcomingExams,
-}: StatsProps) {
+  activeJobs,
+  departments,
+}: StatsSectionProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-      <StatCard number={total} label="Total Jobs" color="blue" />
-      <StatCard number={active} label="Active Jobs" color="green" />
-      <StatCard number={upcomingExams} label="Upcoming Exams" color="purple" />
-      <StatCard number={15} label="Departments" color="orange" />
+      <StatCard
+        label="NEW GOVT JOBS"
+        value={newGovtJobs}
+        className="bg-orange-500"
+      />
+
+      <StatCard
+        label="UPCOMING EXAMS"
+        value={upcomingExams}
+        className="bg-blue-600"
+      />
+
+      <StatCard
+        label="ACTIVE JOBS"
+        value={activeJobs}
+        className="bg-emerald-500"
+      />
+
+      <StatCard
+        label="DEPARTMENTS"
+        value={`${departments}+`}
+        className="bg-gradient-to-br from-violet-600 to-purple-700"
+      />
 
     </div>
   );
 }
 
 function StatCard({
-  number,
   label,
-  color,
+  value,
+  className,
 }: {
-  number: number;
   label: string;
-  color: string;
+  value: number | string;
+  className: string;
 }) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border text-center">
-      <p className={`text-2xl font-bold text-purple-600`}>
-        {number}+
-      </p>
-      <p className="text-sm text-gray-500 mt-1">
+    <div className={`${className} rounded-2xl px-6 py-5 text-white`}>
+      <p className="text-xs font-semibold tracking-widest uppercase opacity-90">
         {label}
+      </p>
+      <p className="text-5xl font-extrabold mt-2 leading-none">
+        {value}
       </p>
     </div>
   );

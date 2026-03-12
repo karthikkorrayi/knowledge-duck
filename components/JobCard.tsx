@@ -1,8 +1,17 @@
-type JobProps = {
-  title: string;
-  department: string;
-  location: string;
-  last_date: string;
+// Matches the richer card design from screenshot 2:
+// Org logo | Title + badge | Location + type | Vacancies + time | Apply Now button
+
+type JobCardProps = {
+  title:      string;
+  department: string;    // organization name
+  location:   string;    // e.g. "Hyderabad" or "All India"
+  last_date:  string;    // formatted date string
+  vacancies?: number;
+  category?:  string;
+  jobType?:   string;    // "Full-Time" | "Apprenticeship" | "Contract" etc
+  postedAt?:  string;    // e.g. "2 days ago"
+  applyLink?: string;
+  isTrending?: boolean;
 };
 
 export default function JobCard({
@@ -10,43 +19,83 @@ export default function JobCard({
   department,
   location,
   last_date,
-}: JobProps) {
+  vacancies,
+  category,
+  jobType = 'Full-Time',
+  postedAt,
+  applyLink,
+  isTrending = false,
+}: JobCardProps) {
   return (
-    <div className="bg-white border rounded-xl p-5 hover:shadow-lg transition duration-300">
+    <div className="flex items-center gap-4 py-3">
 
-      <div className="flex justify-between items-start">
-        <h3 className="font-semibold text-lg">
-          {title}
-        </h3>
-
-        <span className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded">
-          Active
-        </span>
+      {/* Org logo circle */}
+      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-blue-200 flex items-center justify-center overflow-hidden">
+        <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+            d="M3 21V7a2 2 0 012-2h4V3h6v2h4a2 2 0 012 2v14M9 21v-6h6v6" />
+        </svg>
       </div>
 
-      <p className="text-sm text-gray-500 mt-1">
-        {department}
-      </p>
+      {/* Main content */}
+      <div className="flex-1 min-w-0">
+        {/* Title + Trending badge */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="text-base font-bold text-gray-800 leading-tight">
+            {title}
+          </h3>
+          {isTrending && (
+            <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">
+              Trending
+            </span>
+          )}
+        </div>
 
-      <p className="text-sm text-gray-500">
-        Location: {location}
-      </p>
-
-      <div className="mt-4 flex justify-between items-center">
-        <span className="text-sm">
-          Last Date:{" "}
-          <span className="font-medium text-red-500">
-            {last_date}
+        {/* Location + type */}
+        <div className="flex items-center gap-3 mt-1 flex-wrap">
+          <span className="flex items-center gap-1 text-xs text-gray-500">
+            <svg className="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+            </svg>
+            {location}
           </span>
-        </span>
+          {jobType && (
+            <span className="text-xs text-gray-400">| {jobType}</span>
+          )}
+          {last_date && last_date !== '—' && (
+            <span className="text-xs text-red-500 font-medium">Last: {last_date}</span>
+          )}
+        </div>
+      </div>
 
+      {/* Right side: vacancies + time + Apply */}
+      <div className="flex-shrink-0 flex flex-col items-end gap-2">
+        <div className="text-right">
+          {vacancies && (
+            <p className="text-sm font-bold text-gray-700">
+              <span className="flex items-center gap-1 justify-end">
+                <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" />
+                </svg>
+                {vacancies.toLocaleString()}+
+              </span>
+            </p>
+          )}
+          {postedAt && (
+            <p className="text-xs text-gray-400 mt-0.5">{postedAt}</p>
+          )}
+        </div>
         <a
-          href="#"
-          className="text-blue-600 text-sm font-medium"
+          href={applyLink ?? '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap"
         >
-          View →
+          Apply Now <span>›</span>
         </a>
       </div>
+
     </div>
   );
 }
