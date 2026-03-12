@@ -4,6 +4,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 // Qualification → keywords to match against job title/category
+
+const CATEGORY_FILTER_MAP: Record<string, string[]> = {
+  'SSC Jobs': ['SSC Jobs', 'Civil Services'],
+  'Bank Jobs': ['Bank Jobs', 'Banking'],
+  'Railway Jobs': ['Railway Jobs', 'Railway'],
+  'PSC Jobs': ['PSC Jobs', 'Civil Services'],
+  'Police/Defense Jobs': ['Police/Defense Jobs', 'Police', 'Defence'],
+  'Teachers Jobs': ['Teachers Jobs', 'Teaching'],
+  'Engineering Jobs': ['Engineering Jobs', 'Engineering'],
+  'Medical Jobs': ['Medical Jobs', 'Medical'],
+  'PSU Jobs': ['PSU Jobs', 'PSU'],
+  'Clerk Jobs': ['Clerk Jobs', 'Clerk'],
+};
+
 const QUAL_KEYWORDS: Record<string, string[]> = {
   '10th Pass':    ['10th', 'matriculation', 'sslc', 'matric'],
   '12th Pass':    ['12th', 'intermediate', 'hsc', 'higher secondary'],
@@ -49,7 +63,12 @@ export async function GET(req: NextRequest) {
 
   // ── Category filter ───────────────────────────────────────────
   if (category) {
-    query = query.eq('category', category);
+    const categoryValues = CATEGORY_FILTER_MAP[category] ?? [category];
+    if (categoryValues.length === 1) {
+      query = query.eq('category', categoryValues[0]);
+    } else {
+      query = query.in('category', categoryValues);
+    }
   }
 
   // ── Text search (title + organization) ───────────────────────

@@ -102,30 +102,48 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 // ── Page ──────────────────────────────────────────────────────────
 // searchParams come from the URL — updated by the client filter components
+type JobsPageSearchParams = {
+  page?:     string;
+  state?:    string;
+  category?: string;
+  search?:   string;
+  qual?:     string;
+  days?:     string;
+  sort?:     string;
+};
+
 export default async function JobsPage({
   searchParams,
 }: {
-  searchParams: {
-    page?:     string;
-    state?:    string;
-    category?: string;
-    search?:   string;
-    qual?:     string;
-    days?:     string;
-    sort?:     string;
-  };
+  searchParams: Promise<JobsPageSearchParams>;
 }) {
+  const params = await searchParams;
+
   // Build params object — only include non-empty values
   const apiParams: Record<string, string> = { limit: '10' };
-  if (searchParams.page)     apiParams.page     = searchParams.page;
-  if (searchParams.state)    apiParams.state     = searchParams.state;
-  if (searchParams.category) apiParams.category  = searchParams.category;
-  if (searchParams.search)   apiParams.search    = searchParams.search;
-  if (searchParams.qual)     apiParams.qual      = searchParams.qual;
-  if (searchParams.days)     apiParams.days      = searchParams.days;
-  if (searchParams.sort)     apiParams.sort      = searchParams.sort;
+  if (params.page)     apiParams.page     = params.page;
+  if (params.state)    apiParams.state    = params.state;
+  if (params.category) apiParams.category = params.category;
+  if (params.search)   apiParams.search   = params.search;
+  if (params.qual)     apiParams.qual     = params.qual;
+  if (params.days)     apiParams.days     = params.days;
+  if (params.sort)     apiParams.sort     = params.sort;
 
-  const currentPage = parseInt(searchParams.page ?? '1', 10);
+  const currentPage = parseInt(params.page ?? '1', 10);
+
+  const buildJobsUrl = (overrides: Partial<JobsPageSearchParams>) => {
+    const merged: JobsPageSearchParams = { ...params, ...overrides };
+    const qs = new URLSearchParams();
+
+    if (merged.state) qs.set('state', merged.state);
+    if (merged.category) qs.set('category', merged.category);
+    if (merged.search) qs.set('search', merged.search);
+    if (merged.qual) qs.set('qual', merged.qual);
+    if (merged.days) qs.set('days', merged.days);
+    if (merged.sort) qs.set('sort', merged.sort);
+
+    return qs.toString() ? `/jobs?${qs.toString()}` : '/jobs';
+  };
 
   const [{ jobs, total, totalPages }, categories] = await Promise.all([
     fetchJobs(apiParams),
@@ -171,14 +189,14 @@ export default async function JobsPage({
                 Showing{' '}
                 <span className="text-blue-700">{total.toLocaleString()}</span>{' '}
                 Job Listing{total !== 1 ? 's' : ''}
-                {searchParams.state && (
+                {params.state && (
                   <span className="ml-1 text-gray-400 font-normal">
-                    in {STATE_LOCATION[searchParams.state] ?? searchParams.state}
+                    in {STATE_LOCATION[params.state] ?? params.state}
                   </span>
                 )}
-                {searchParams.category && (
+                {params.category && (
                   <span className="ml-1 text-gray-400 font-normal">
-                    — {searchParams.category}
+                    — {params.category}
                   </span>
                 )}
               </p>
@@ -186,7 +204,7 @@ export default async function JobsPage({
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span>Sort By:</span>
                 <Suspense fallback={null}>
-                  <JobsSortSelect currentSort={searchParams.sort ?? 'newest'} />
+                  <JobsSortSelect currentSort={params.sort ?? 'newest'} />
                 </Suspense>
               </div>
             </div>
@@ -251,9 +269,9 @@ export default async function JobsPage({
                 {categories.map((cat) => (
                   <Link
                     key={cat.category}
-                    href={`/jobs?category=${encodeURIComponent(cat.category)}`}
+                    href={buildJobsUrl({ category: cat.category, page: undefined })}
                     className={`flex items-center justify-between py-2.5 px-3 rounded-xl transition-colors group ${
-                      searchParams.category === cat.category
+                      params.category === cat.category
                         ? 'bg-blue-600 text-white'
                         : 'hover:bg-blue-50'
                     }`}
@@ -261,7 +279,7 @@ export default async function JobsPage({
                     <div className="flex items-center gap-2.5">
                       <span className="text-base">{CATEGORY_ICONS[cat.category] ?? '📌'}</span>
                       <span className={`text-sm font-semibold ${
-                        searchParams.category === cat.category
+                        params.category === cat.category
                           ? 'text-white'
                           : 'text-gray-700 group-hover:text-blue-700'
                       }`}>
@@ -269,7 +287,7 @@ export default async function JobsPage({
                       </span>
                     </div>
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full min-w-[32px] text-center ${
-                      searchParams.category === cat.category
+                      params.category === cat.category
                         ? 'bg-white text-blue-600'
                         : 'bg-blue-600 text-white'
                     }`}>
@@ -290,9 +308,9 @@ export default async function JobsPage({
               ].map((s) => (
                 <Link
                   key={s.value}
-                  href={`/jobs?state=${s.value}`}
+                  href={buildJobsUrl({ state: s.value, page: undefined })}
                   className={`flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0 transition-colors group ${
-                    searchParams.state === s.value ? 'text-blue-600 font-bold' : 'hover:text-blue-600'
+                    params.state === s.value ? 'text-blue-600 font-bold' : 'hover:text-blue-600'
                   }`}
                 >
                   <span className="text-sm">{s.label}</span>
