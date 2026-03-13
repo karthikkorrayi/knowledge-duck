@@ -3,7 +3,7 @@ import type { ScraperResult, RawJob } from '../types';
 
 const BASE_URL   = 'https://www.freejobalert.com';
 const HOME_URL   = BASE_URL + '/';
-const MAX_PAGES  = 8;
+const MAX_PAGES  = 40;
 const DELAY_MS   = 800;
 
 const HEADERS = {

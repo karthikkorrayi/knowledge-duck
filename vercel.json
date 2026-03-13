@@ -1,10 +1,1 @@
-{
-  "functions": {
-    "app/api/cron/freejobalert/route.ts": {
-      "maxDuration": 10
-    },
-    "app/api/cron/telugucareers/route.ts": {
-      "maxDuration": 10
-    }
-  }
-}
+{}
