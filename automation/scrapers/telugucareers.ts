@@ -10,7 +10,7 @@ const STATE_PAGES: { state: JobState; url: string }[] = [
   { state: 'CENTRAL', url: `${BASE_URL}/category/central-govt-jobs/` },
 ];
 
-const MAX_ARTICLES = 5;
+const MAX_ARTICLES = 4;
 const DELAY_MS     = 800;
 
 const HEADERS = {
@@ -336,4 +336,10 @@ export async function scrapeTeluguCareers(): Promise<ScraperResult> {
   }
   console.log(`\n[telugucareers] Total: ${all.length} jobs`);
   return { jobs: all, exams: [] };
+}
+
+export async function scrapeTeluguCareersState(state: JobState): Promise<RawJob[]> {
+  const page = STATE_PAGES.find((p) => p.state === state);
+  if (!page) return [];
+  return scrapeState(state, page.url);
 }

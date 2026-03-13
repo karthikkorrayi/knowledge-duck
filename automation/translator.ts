@@ -12,25 +12,19 @@ export async function translateToEnglish(text: string): Promise<string> {
   if (!hasSignificantTelugu(text)) return text;
 
   const trimmed = text.trim();
+  if (process.env.NODE_ENV === 'production') {
+    return quickTranslate(trimmed);
+  }
   if (cache.has(trimmed)) return cache.get(trimmed)!;
-
   try {
     const { translate } = require('google-translate-api-x');
     const result = await translate(trimmed, { to: 'en' });
     const translated: string = result?.text ?? trimmed;
     cache.set(trimmed, translated);
-    await sleep(100); // gentle rate limit
+    await sleep(100);
     return translated;
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes('Cannot find module')) {
-      // Package not installed — only warn once
-      if (!cache.has('__warned__')) {
-        console.warn('[translator] google-translate-api-x not installed. Run: npm install google-translate-api-x');
-        cache.set('__warned__', '1');
-      }
-    }
-    return trimmed; // Return original text, don't crash
+  } catch {
+    return trimmed;
   }
 }
 
