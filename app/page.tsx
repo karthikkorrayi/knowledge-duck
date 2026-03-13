@@ -172,15 +172,13 @@ export default async function HomePage() {
                     </p>
                   </div>
 
-                  {/* Apply button */}
-                  <a
-                    href={job.apply_link ?? job.notification_link ?? job.source_url ?? '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  {/* View details button */}
+                  <Link
+                    href={`/jobs/${job.id}`}
                     className="flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
                   >
-                    Apply Now
-                  </a>
+                    View Details <span>›</span>
+                  </Link>
                 </div>
               ))
             )}
