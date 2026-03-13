@@ -10,7 +10,7 @@ const STATE_PAGES: { state: JobState; url: string }[] = [
   { state: 'CENTRAL', url: `${BASE_URL}/category/central-govt-jobs/` },
 ];
 
-const MAX_ARTICLES = 15;
+const MAX_ARTICLES = 5;
 const DELAY_MS     = 800;
 
 const HEADERS = {
