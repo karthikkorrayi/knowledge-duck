@@ -184,7 +184,7 @@ export default async function JobsPage({
             </Suspense>
 
             {/* Results header */}
-            <div className="flex items-center justify-between mb-3 px-1">
+            <div className="mb-3 flex flex-col gap-2 px-1 sm:flex-row sm:items-center sm:justify-between">
               <p className="font-bold text-gray-700 text-sm">
                 Showing{' '}
                 <span className="text-blue-700">{total.toLocaleString()}</span>{' '}

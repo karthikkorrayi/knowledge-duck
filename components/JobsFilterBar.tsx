@@ -1,14 +1,7 @@
 'use client';
-// Every onChange/submit calls updateParam() which:
-//   1. Copies ALL current URL params into a new URLSearchParams
-//   2. Sets/deletes only the changed key
-//   3. Resets page to 1 (so you never land on page 5 of a fresh filter)
-//   4. Calls router.push() with the merged params
-//
-// This guarantees that changing category keeps state/search etc, and vice versa.
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useCallback, useRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const CATEGORIES = [
   'SSC Jobs', 'Bank Jobs', 'Railway Jobs', 'PSC Jobs',
@@ -17,192 +10,201 @@ const CATEGORIES = [
 ];
 
 const STATES = [
-  { value: 'AP',      label: 'Andhra Pradesh' },
-  { value: 'TS',      label: 'Telangana' },
+  { value: 'AP', label: 'Andhra Pradesh' },
+  { value: 'TS', label: 'Telangana' },
   { value: 'CENTRAL', label: 'Central Government' },
 ];
 
 const QUALIFICATIONS = ['10th Pass', '12th Pass', 'Graduate', 'Post Graduate', 'ITI', 'Diploma'];
 
 const DATE_RANGES = [
-  { value: '7',  label: 'Last 7 Days' },
+  { value: '7', label: 'Last 7 Days' },
   { value: '30', label: 'Last 30 Days' },
   { value: '90', label: 'Last 3 Months' },
 ];
 
+type Draft = {
+  category: string;
+  state: string;
+  qual: string;
+  days: string;
+  search: string;
+};
+
 export default function JobsFilterBar() {
-  const router       = useRouter();
-  const pathname     = usePathname();
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const searchRef    = useRef<HTMLInputElement>(null);
 
-  // Core helper: merge one key into current params, reset page
-  const updateParam = useCallback((key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-    params.delete('page'); // always reset page on filter change
-    router.push(`${pathname}?${params.toString()}`);
-  }, [router, pathname, searchParams]);
-
-  const clearAll = () => router.push(pathname);
-
-  const current = {
+  const current = useMemo<Draft>(() => ({
     category: searchParams.get('category') ?? '',
-    state:    searchParams.get('state')    ?? '',
-    qual:     searchParams.get('qual')     ?? '',
-    days:     searchParams.get('days')     ?? '',
-    search:   searchParams.get('search')   ?? '',
-  };
+    state: searchParams.get('state') ?? '',
+    qual: searchParams.get('qual') ?? '',
+    days: searchParams.get('days') ?? '',
+    search: searchParams.get('search') ?? '',
+  }), [searchParams]);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [draft, setDraft] = useState<Draft>(current);
+
+  useEffect(() => {
+    setDraft(current);
+  }, [current]);
 
   const hasFilters = Object.values(current).some(Boolean);
+  const activeCount = Object.values(current).filter(Boolean).length;
 
-  const handleSearch = () => {
-    updateParam('search', searchRef.current?.value.trim() ?? '');
+  const setSingleValue = (key: keyof Draft, value: string) => {
+    setDraft((prev) => ({ ...prev, [key]: prev[key] === value ? '' : value }));
+  };
+
+  const applyFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    const entries = Object.entries(draft) as [keyof Draft, string][];
+
+    entries.forEach(([key, value]) => {
+      if (value.trim()) params.set(key, value.trim());
+      else params.delete(key);
+    });
+
+    params.delete('page');
+    router.push(params.toString() ? `${pathname}?${params.toString()}` : pathname);
+    setIsOpen(false);
+  };
+
+  const clearAll = () => {
+    setDraft({ category: '', state: '', qual: '', days: '', search: '' });
+    router.push(pathname);
+    setIsOpen(false);
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow p-4 mb-4 space-y-3">
-
-      {/* ── Dropdowns + search + button ── */}
-      <div className="flex flex-wrap gap-3 items-center">
-
-        <SelectBox
-          value={current.category}
-          onChange={(v) => updateParam('category', v)}
-          placeholder="All Categories"
-          options={CATEGORIES.map((c) => ({ value: c, label: c }))}
-        />
-
-        <SelectBox
-          value={current.state}
-          onChange={(v) => updateParam('state', v)}
-          placeholder="Anywhere in India"
-          options={STATES}
-        />
-
-        <SelectBox
-          value={current.qual}
-          onChange={(v) => updateParam('qual', v)}
-          placeholder="Any Qualification"
-          options={QUALIFICATIONS.map((q) => ({ value: q, label: q }))}
-        />
-
-        <SelectBox
-          value={current.days}
-          onChange={(v) => updateParam('days', v)}
-          placeholder="All Posted Dates"
-          options={DATE_RANGES}
-        />
-
-        {/* Search input */}
-        <div className="relative flex-1 min-w-[160px]">
-          <input
-            ref={searchRef}
-            type="text"
-            placeholder="Search jobs…"
-            defaultValue={current.search}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400 text-gray-700"
-          />
-        </div>
-
+    <div className="mb-4 rounded-2xl bg-white p-4 shadow">
+      <div className="flex flex-wrap items-center gap-3">
         <button
-          onClick={handleSearch}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-7 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
+          aria-expanded={isOpen}
+          aria-controls="jobs-filters-panel"
         >
-          Search
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13.828V19l-4 2v-7.172a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" />
+          </svg>
+          Filters
+          {activeCount > 0 && (
+            <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
+              {activeCount}
+            </span>
+          )}
         </button>
-      </div>
 
-      {/* ── Active filter chips ── */}
-      {hasFilters && (
-        <div className="flex flex-wrap gap-2 items-center pt-0.5">
-          <span className="text-xs text-gray-400 font-medium">Active:</span>
-
-          {current.category && (
-            <Chip label={current.category} onRemove={() => updateParam('category', '')} />
-          )}
-          {current.state && (
-            <Chip
-              label={STATES.find((s) => s.value === current.state)?.label ?? current.state}
-              onRemove={() => updateParam('state', '')}
-            />
-          )}
-          {current.qual && (
-            <Chip label={current.qual} onRemove={() => updateParam('qual', '')} />
-          )}
-          {current.days && (
-            <Chip
-              label={DATE_RANGES.find((d) => d.value === current.days)?.label ?? `${current.days}d`}
-              onRemove={() => updateParam('days', '')}
-            />
-          )}
-          {current.search && (
-            <Chip label={`"${current.search}"`} onRemove={() => updateParam('search', '')} />
-          )}
-
-          <button
-            onClick={clearAll}
-            className="text-xs text-red-400 hover:text-red-600 font-semibold underline ml-1"
-          >
+        {hasFilters && (
+          <button onClick={clearAll} className="text-sm font-semibold text-red-500 hover:text-red-600">
             Clear all
           </button>
+        )}
+      </div>
+
+      {isOpen && (
+        <div id="jobs-filters-panel" className="mt-4 space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <FilterGroup
+            title="Category"
+            options={CATEGORIES.map((value) => ({ value, label: value }))}
+            selected={draft.category}
+            onChange={(value) => setSingleValue('category', value)}
+          />
+
+          <FilterGroup
+            title="Location"
+            options={STATES}
+            selected={draft.state}
+            onChange={(value) => setSingleValue('state', value)}
+          />
+
+          <FilterGroup
+            title="Qualification"
+            options={QUALIFICATIONS.map((value) => ({ value, label: value }))}
+            selected={draft.qual}
+            onChange={(value) => setSingleValue('qual', value)}
+          />
+
+          <FilterGroup
+            title="Posted Date"
+            options={DATE_RANGES}
+            selected={draft.days}
+            onChange={(value) => setSingleValue('days', value)}
+          />
+
+          <div>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Search keyword
+            </label>
+            <input
+              value={draft.search}
+              onChange={(e) => setDraft((prev) => ({ ...prev, search: e.target.value }))}
+              type="text"
+              placeholder="Search jobs..."
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-blue-400 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              onClick={applyFilters}
+              className="inline-flex items-center rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-orange-600"
+            >
+              Apply Filters
+            </button>
+            <button
+              onClick={clearAll}
+              className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-100"
+            >
+              Reset
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-// ── SelectBox ─────────────────────────────────────────────────────
-function SelectBox({
-  value,
-  onChange,
-  placeholder,
+function FilterGroup({
+  title,
   options,
+  selected,
+  onChange,
 }: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
+  title: string;
   options: { value: string; label: string }[];
+  selected: string;
+  onChange: (value: string) => void;
 }) {
   return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="appearance-none border border-gray-200 rounded-xl px-4 py-2.5 pr-8 text-sm bg-white focus:outline-none focus:border-blue-400 font-medium text-gray-700 cursor-pointer"
-      >
-        <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-      <svg
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
-        fill="none" stroke="currentColor" viewBox="0 0 24 24"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    </div>
-  );
-}
-
-// ── Filter chip ───────────────────────────────────────────────────
-function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-blue-200">
-      {label}
-      <button
-        onClick={onRemove}
-        className="hover:text-red-500 font-bold leading-none ml-0.5"
-        aria-label={`Remove ${label}`}
-      >
-        ×
-      </button>
-    </span>
+    <fieldset>
+      <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">{title}</legend>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {options.map((option) => {
+          const checked = selected === option.value;
+          return (
+            <label
+              key={option.value}
+              className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
+                checked
+                  ? 'border-blue-300 bg-blue-50 text-blue-700'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-blue-200'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => onChange(option.value)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span>{option.label}</span>
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }

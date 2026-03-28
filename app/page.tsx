@@ -71,15 +71,8 @@ export default async function HomePage() {
     <div className="min-h-screen bg-[#dde8ff] flex flex-col">
       <DashboardHeader />
 
-      {/* ── Hero ── */}
-      <div className="text-center py-7 px-4">
-        <h1 className="text-3xl font-extrabold text-[#1e3a8a]">
-          Welcome, Student! Explore Latest Govt Job Updates
-        </h1>
-      </div>
-
       {/* ── Stat cards ── */}
-      <div className="px-6 pb-5 grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="px-6 pt-6 pb-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
         {/* New Govt Jobs */}
         <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl p-5 text-white flex items-center gap-4 shadow">
@@ -142,7 +135,7 @@ export default async function HomePage() {
       <div className="px-6 pb-20 grid grid-cols-12 gap-5">
 
         {/* ── Left: Latest Notifications ── */}
-        <div className="col-span-12 md:col-span-4 bg-white rounded-2xl shadow overflow-hidden flex flex-col">
+        <div id="latest-notifications" className="col-span-12 md:col-span-4 bg-white rounded-2xl shadow overflow-hidden flex flex-col scroll-mt-36">
           <div className="bg-[#1d4ed8] px-5 py-4">
             <h2 className="text-white font-bold text-base">Latest Govt Job Notifications</h2>
           </div>
@@ -196,7 +189,7 @@ export default async function HomePage() {
 
         {/* ── Middle: Upcoming Exams + Ad ── */}
         <div className="col-span-12 md:col-span-5 flex flex-col gap-4">
-          <div className="bg-white rounded-2xl shadow overflow-hidden flex-1">
+          <div id="upcoming-exams" className="bg-white rounded-2xl shadow overflow-hidden flex-1 scroll-mt-36">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <h2 className="font-bold text-gray-800 text-base">Upcoming Exams</h2>
               <Link href="/exams" className="text-sm text-blue-600 hover:underline font-semibold flex items-center gap-1">
@@ -260,7 +253,7 @@ export default async function HomePage() {
           </div>
 
           {/* Resources */}
-          <div className="bg-white rounded-2xl shadow p-5 flex-1">
+          <div id="resources" className="bg-white rounded-2xl shadow p-5 flex-1 scroll-mt-36">
             <h2 className="font-bold text-gray-800 text-base mb-3">Resources</h2>
             {[
               { icon: '📄', label: 'Exam Syllabus PDFs',  href: '/resources/syllabus' },

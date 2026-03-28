@@ -348,14 +348,14 @@ export default async function JobDetailPage({
 
             {/* Hero */}
             <div className="rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-[#1d4ed8] to-[#1e40af]">
-              <div className="p-5 md:p-6 flex items-start gap-4">
+              <div className="p-4 md:p-6 flex flex-col gap-4 sm:flex-row sm:items-start">
                 <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 21V7a2 2 0 012-2h4V3h6v2h4a2 2 0 012 2v14M9 21v-6h6v6" />
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-xl md:text-2xl font-extrabold text-white leading-snug">{job.title}</h1>
+                  <h1 className="text-2xl md:text-2xl font-extrabold text-white leading-snug break-words">{job.title}</h1>
                   <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-blue-100 text-sm">
                     <span>{job.job_location ?? STATE_LABEL[job.state] ?? 'India'}</span>
                     {job.vacancies && <span>{job.vacancies.toLocaleString()} Vacancies</span>}
@@ -364,12 +364,12 @@ export default async function JobDetailPage({
                 </div>
                 {applyUrl && !expired && (
                   <a href={applyUrl} target="_blank" rel="noopener noreferrer"
-                    className="flex-shrink-0 bg-orange-500 hover:bg-orange-400 text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors shadow-md">
+                    className="w-full sm:w-auto text-center flex-shrink-0 bg-orange-500 hover:bg-orange-400 text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors shadow-md">
                     Apply Now
                   </a>
                 )}
                 {expired && (
-                  <span className="flex-shrink-0 bg-gray-400 text-white font-bold text-sm px-5 py-3 rounded-xl">
+                  <span className="w-full sm:w-auto text-center flex-shrink-0 bg-gray-400 text-white font-bold text-sm px-5 py-3 rounded-xl">
                     Closed
                   </span>
                 )}
