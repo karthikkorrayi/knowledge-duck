@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import DashboardHeader from '@/components/DashboardHeader';
-import JobDetailTabs from '@/components/JobDetailTabs';
+import JobDetailTabs, { type TabItem } from '@/components/JobDetailTabs';
 
 interface Job {
   id:                 string;
@@ -139,184 +139,178 @@ export default async function JobDetailPage({
   const hasApplication = !!(selSteps.length || feeRows.length || applyUrl);
   const hasDates = !!(job.last_date || job.exam_date || job.notification_date);
 
-  const panels = {
+  const detailsContent = (
 
-    // ── Tab 1: Job Details ────────────────────────────────────────
-    details: (
-      <div className="space-y-6">
-        {job.description && (
-          <div>
-            <h3 className="text-base font-bold text-gray-800 mb-2">Job Overview</h3>
-            <div className="text-sm text-gray-600 leading-relaxed space-y-2">
-              {stripEmoji(job.description).split(/\n\n+/).filter(Boolean).map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Vacancy table */}
-          {job.vacancies && (
-            <div>
-              <h3 className="text-base font-bold text-gray-800 mb-3">Vacancy Details</h3>
-              <div className="rounded-xl overflow-hidden border border-gray-200">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-[#1d4ed8] text-white">
-                      <th className="text-left px-4 py-2.5 font-semibold">Post</th>
-                      <th className="text-right px-4 py-2.5 font-semibold">Vacancies</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-2.5 text-gray-800">{job.department ?? job.category ?? 'Various Posts'}</td>
-                      <td className="px-4 py-2.5 text-right font-bold text-gray-800">{job.vacancies.toLocaleString()}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Salary */}
-          {job.salary && (
-            <div>
-              <h3 className="text-base font-bold text-gray-800 mb-3">Salary</h3>
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p className="text-lg font-bold text-blue-700 mb-1">{stripEmoji(job.salary)}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Overview table of all available fields */}
+    <div className="space-y-6">
+      {job.description && (
         <div>
-          <h3 className="text-base font-bold text-gray-800 mb-3">Job Overview</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-            {job.organization     && <InfoRow label="Organization"    value={stripEmoji(job.organization)} />}
-            {job.category         && <InfoRow label="Category"        value={stripEmoji(job.category)} />}
-            {job.job_location     && <InfoRow label="Location"        value={stripEmoji(job.job_location)} />}
-            {job.vacancies        && <InfoRow label="Total Vacancies" value={`${job.vacancies.toLocaleString()} Posts`} />}
-            {job.notification_date && <InfoRow label="Notification Date" value={fmt(job.notification_date)} />}
-            {job.last_date        && <InfoRow label="Last Date to Apply" value={fmt(job.last_date)} highlight={expired} />}
-            {job.exam_date        && <InfoRow label="Exam Date"       value={fmt(job.exam_date)} />}
+          <h3 className="text-base font-bold text-gray-800 mb-2">Job Overview</h3>
+          <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+            {stripEmoji(job.description).split(/\n\n+/).filter(Boolean).map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
           </div>
         </div>
-      </div>
-    ),
+      )}
 
-    // ── Tab 2: Eligibility ────────────────────────────────────────
-    eligibility: hasEligibility ? (
-      <div className="space-y-4">
-        {job.qualification && (
-          <Section title="Educational Qualification">
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-              {stripEmoji(job.qualification)}
-            </p>
-          </Section>
-        )}
-        {job.age_limit && (
-          <Section title="Age Limit">
-            <p className="text-sm text-gray-700">{stripEmoji(job.age_limit)}</p>
-          </Section>
-        )}
-      </div>
-    ) : (
-      <EmptyTab />
-    ),
-
-    // ── Tab 3: Application Process ────────────────────────────────
-    application: hasApplication ? (
-      <div className="space-y-5">
-
-        {/* Application Fee */}
-        {feeRows.length > 0 && (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Vacancy table */}
+        {job.vacancies && (
           <div>
-            <h3 className="text-base font-bold text-gray-800 mb-3">Application Fee</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {feeRows.map((row, i) => (
-                <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-500 mb-1">{row.category}</p>
-                  <p className={`text-sm font-bold ${
-                    row.amount.toLowerCase().includes('free') || row.amount === '0' || row.amount === 'Nil'
-                      ? 'text-green-600' : 'text-blue-700'
-                  }`}>{row.amount || 'Nil'}</p>
-                </div>
-              ))}
+            <h3 className="text-base font-bold text-gray-800 mb-3">Vacancy Details</h3>
+            <div className="rounded-xl overflow-hidden border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#1d4ed8] text-white">
+                    <th className="text-left px-4 py-2.5 font-semibold">Post</th>
+                    <th className="text-right px-4 py-2.5 font-semibold">Vacancies</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="hover:bg-gray-50">
+                    <td className="px-4 py-2.5 text-gray-800">{job.department ?? job.category ?? 'Various Posts'}</td>
+                    <td className="px-4 py-2.5 text-right font-bold text-gray-800">{job.vacancies.toLocaleString()}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
-        {/* Selection Process */}
-        {selSteps.length > 0 && (
+        {/* Salary */}
+        {job.salary && (
           <div>
-            <h3 className="text-base font-bold text-gray-800 mb-3">Selection Process</h3>
-            <div className="flex flex-wrap items-center gap-2">
-              {selSteps.map((step, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2">
-                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
-                      {i + 1}
-                    </span>
-                    <span className="text-sm font-semibold text-blue-800">{step}</span>
-                  </div>
-                  {i < selSteps.length - 1 && (
-                    <span className="text-gray-300 font-bold">›</span>
-                  )}
-                </div>
-              ))}
+            <h3 className="text-base font-bold text-gray-800 mb-3">Salary</h3>
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <p className="text-lg font-bold text-blue-700 mb-1">{stripEmoji(job.salary)}</p>
             </div>
           </div>
         )}
+      </div>
 
-        {/* How to Apply steps — always show if apply link exists */}
-        {applyUrl && (
-          <div>
-            <h3 className="text-base font-bold text-gray-800 mb-3">How to Apply</h3>
-            <ol className="space-y-2">
-              {[
-                `Visit the official website${siteUrl ? `: ${siteUrl}` : ''}`,
-                'Register or log in with your credentials',
-                'Fill in the application form with correct details',
-                'Upload the required documents as specified',
-                'Pay the application fee if applicable',
-                'Submit the form and save the confirmation page',
-              ].map((step, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+      {/* Overview table of all available fields */}
+      <div>
+        <h3 className="text-base font-bold text-gray-800 mb-3">Job Overview</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+          {job.organization     && <InfoRow label="Organization"    value={stripEmoji(job.organization)} />}
+          {job.category         && <InfoRow label="Category"        value={stripEmoji(job.category)} />}
+          {job.job_location     && <InfoRow label="Location"        value={stripEmoji(job.job_location)} />}
+          {job.vacancies        && <InfoRow label="Total Vacancies" value={`${job.vacancies.toLocaleString()} Posts`} />}
+          {job.notification_date && <InfoRow label="Notification Date" value={fmt(job.notification_date)} />}
+          {job.last_date        && <InfoRow label="Last Date to Apply" value={fmt(job.last_date)} highlight={expired} />}
+          {job.exam_date        && <InfoRow label="Exam Date"       value={fmt(job.exam_date)} />}
+        </div>
+      </div>
+    </div>
+  );
+
+  const eligibilityContent = (
+    <div className="space-y-4">
+      {job.qualification && (
+        <Section title="Educational Qualification">
+          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+            {stripEmoji(job.qualification)}
+          </p>
+        </Section>
+      )}
+      {job.age_limit && (
+        <Section title="Age Limit">
+          <p className="text-sm text-gray-700">{stripEmoji(job.age_limit)}</p>
+        </Section>
+      )}
+    </div>
+  );
+
+  const applicationContent = (
+    <div className="space-y-5">
+
+      {/* Application Fee */}
+      {feeRows.length > 0 && (
+        <div>
+          <h3 className="text-base font-bold text-gray-800 mb-3">Application Fee</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {feeRows.map((row, i) => (
+              <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
+                <p className="text-xs text-gray-500 mb-1">{row.category}</p>
+                <p className={`text-sm font-bold ${
+                  row.amount.toLowerCase().includes('free') || row.amount === '0' || row.amount === 'Nil'
+                    ? 'text-green-600' : 'text-blue-700'
+                }`}>{row.amount || 'Nil'}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Selection Process */}
+      {selSteps.length > 0 && (
+        <div>
+          <h3 className="text-base font-bold text-gray-800 mb-3">Selection Process</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            {selSteps.map((step, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2">
+                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
                     {i + 1}
                   </span>
-                  <span className="text-sm text-gray-700 pt-0.5">{step}</span>
-                </li>
-              ))}
-            </ol>
+                  <span className="text-sm font-semibold text-blue-800">{step}</span>
+                </div>
+                {i < selSteps.length - 1 && (
+                  <span className="text-gray-300 font-bold">›</span>
+                )}
+              </div>
+            ))}
           </div>
-        )}
-      </div>
-    ) : (
-      <EmptyTab />
-    ),
+          </div>
+      )}
 
-    // ── Tab 4: Important Dates ────────────────────────────────────
-    dates: hasDates ? (
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {job.notification_date && (
-            <DateCard label="Notification Date"  date={fmt(job.notification_date)} color="blue" />
-          )}
-          {job.last_date && (
-            <DateCard label="Last Date to Apply" date={fmt(job.last_date)}         color={expired ? 'red' : 'orange'} note={expired ? 'Deadline passed' : undefined} />
-          )}
-          {job.exam_date && (
-            <DateCard label="Exam Date"          date={fmt(job.exam_date)}          color="green" />
-          )}
+      {/* How to Apply steps — always show if apply link exists */}
+      {applyUrl && (
+        <div>
+          <h3 className="text-base font-bold text-gray-800 mb-3">How to Apply</h3>
+          <ol className="space-y-2">
+            {[
+              `Visit the official website${siteUrl ? `: ${siteUrl}` : ''}`,
+              'Register or log in with your credentials',
+              'Fill in the application form with correct details',
+              'Upload the required documents as specified',
+              'Pay the application fee if applicable',
+              'Submit the form and save the confirmation page',
+            ].map((step, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                  {i + 1}
+                </span>
+                <span className="text-sm text-gray-700 pt-0.5">{step}</span>
+              </li>
+            ))}
+          </ol>
         </div>
-      </div>
-    ) : (
-      <EmptyTab />
-    ),
-  };
+      )}
+    </div>
+  );
+
+  const datesContent = (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {job.notification_date && (
+          <DateCard label="Notification Date"  date={fmt(job.notification_date)} color="blue" />
+        )}
+        {job.last_date && (
+          <DateCard label="Last Date to Apply" date={fmt(job.last_date)}         color={expired ? 'red' : 'orange'} note={expired ? 'Deadline passed' : undefined} />
+        )}
+        {job.exam_date && (
+          <DateCard label="Exam Date"          date={fmt(job.exam_date)}          color="green" />
+        )}
+        </div>
+        </div>
+  );
+
+  const tabItems: TabItem[] = [];
+  if (hasDetails) tabItems.push({ key: 'details', label: 'Job Details', content: detailsContent });
+  if (hasEligibility) tabItems.push({ key: 'eligibility', label: 'Eligibility', content: eligibilityContent });
+  if (hasApplication) tabItems.push({ key: 'application', label: 'Application Process', content: applicationContent });
+  if (hasDates) tabItems.push({ key: 'dates', label: 'Important Dates', content: datesContent });
 
   // FAQs — only for fields that have data
   const faqs = [
@@ -377,9 +371,11 @@ export default async function JobDetailPage({
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-2xl shadow overflow-hidden">
-              <JobDetailTabs panels={panels} />
-            </div>
+            {tabItems.length > 0 && (
+              <div className="bg-white rounded-2xl shadow overflow-hidden">
+                <JobDetailTabs items={tabItems} />
+              </div>
+            )}
 
             {/* Bottom action buttons — only show real links */}
             {(pdfUrl || applyUrl || siteUrl) && (
@@ -512,14 +508,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
       <h4 className="text-sm font-bold text-[#1e3a8a] mb-2">{title}</h4>
       {children}
-    </div>
-  );
-}
-
-function EmptyTab() {
-  return (
-    <div className="py-8 text-center">
-      <p className="text-sm text-gray-400">No details available for this section.</p>
     </div>
   );
 }
