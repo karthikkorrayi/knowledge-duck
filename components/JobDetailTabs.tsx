@@ -19,8 +19,18 @@ export default function JobDetailTabs({ panels }: Props) {
 
   return (
     <div>
+      {/* Mobile: linear sections instead of tab navigation */}
+      <div className="space-y-6 p-5 md:hidden">
+        {TABS.map((tab) => (
+          <section key={tab.key}>
+            <h3 className="mb-3 text-lg font-bold text-gray-800">{tab.label}</h3>
+            {panels[tab.key]}
+          </section>
+        ))}
+      </div>
+
       {/* Tab bar */}
-      <div className="flex border-b border-gray-200 bg-white overflow-x-auto">
+      <div className="hidden overflow-x-auto border-b border-gray-200 bg-white md:flex">
         {TABS.map((tab) => (
           <button
             key={tab.key}
@@ -37,7 +47,7 @@ export default function JobDetailTabs({ panels }: Props) {
       </div>
 
       {/* Active panel */}
-      <div className="p-5">
+      <div className="hidden p-5 md:block">
         {panels[active]}
       </div>
     </div>
