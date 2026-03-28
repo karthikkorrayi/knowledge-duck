@@ -12,7 +12,7 @@ export default function DashboardHeader() {
     <header className="border-b bg-white/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex w-full max-w-7xl flex-col px-3 py-3 sm:px-5">
         <div className="flex items-center">
-          <Image src="/20221113_11223317.png" alt="Knowledge Duck logo" width={300} height={64} className="h-auto w-[220px] sm:w-[280px]" priority />
+          <Image src="/20221113_11223317.png" alt="KnowledgeDuck logo" width={300} height={64} className="h-auto w-[220px] sm:w-[280px]" priority />
         </div>
         <nav className="mt-3 border-t border-gray-100 pt-2 md:hidden">
           <ul className="grid grid-cols-3 gap-2 text-sm">
